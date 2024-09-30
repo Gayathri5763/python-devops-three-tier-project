@@ -1,0 +1,44 @@
+pipeline {
+    agent any 
+    tools {
+        jdk 'jdk'
+        nodejs 'nodejs'
+    }
+    environment  {
+        SCANNER_HOME=tool 'sonarqube'
+        AWS_ACCOUNT_ID = credentials('ACCOUNT_ID')
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    stages {
+        stage('Cleaning Workspace') {
+            steps {
+              cleanWs()
+            }
+        }
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Gayathri5763/python-devops-three-tier-project.git'
+            }
+        }
+        stage('Sonarqube Analysis') {
+            steps {
+                dir('client') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectName=Jenkinsfile_Backend \
+                        -Dsonar.projectKey=Jenkinsfile_Backend '''
+                    }
+                }
+            }
+        }
+         stage('Quality Check') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                }
+            }
+        }
+    }
+}
+     
+         
