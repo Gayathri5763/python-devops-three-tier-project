@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Cleaning Workspace') {
             steps {
-              cleanWs()
+                cleanWs()
             }
         }
         stage('Checkout from Git') {
@@ -31,14 +31,28 @@ pipeline {
                 }
             }
         }
-         stage('Quality Check') {
+        stage('Quality Check') {
             steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                    try {
+                        waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                    } catch (Exception e) {
+                        error("Quality gate check failed: ${e.message}")
+                    }
                 }
             }
         }
     }
+    post {
+        always {
+            echo 'Cleaning up...'
+            cleanWs()
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
 }
-     
-         
