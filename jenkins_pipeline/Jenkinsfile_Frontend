@@ -34,25 +34,10 @@ pipeline {
         stage('Quality Check') {
             steps {
                 script {
-                    try {
-                        waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
-                    } catch (Exception e) {
-                        error("Quality gate check failed: ${e.message}")
-                    }
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
                 }
             }
         }
     }
-    post {
-        always {
-            echo 'Cleaning up...'
-            cleanWs()
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
-    }
+    
 }
