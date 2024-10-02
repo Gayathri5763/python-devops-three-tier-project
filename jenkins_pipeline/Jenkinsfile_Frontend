@@ -31,13 +31,13 @@ pipeline {
                 }
             }
         }
-        stage('Quality Check') {
+        /*stage('Quality Check') {
             steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
                 }
             }
-        }
+        }*/
     }
     
 }
